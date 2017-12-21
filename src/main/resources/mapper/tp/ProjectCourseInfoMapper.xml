@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bossien.mapper.tp.ProjectCourseInfoMapper">
+
+    <!-- 通用查询结果集 -->
+    <resultMap id="BaseResultMap" type="com.bossien.entity.ProjectCourseInfo">
+        <id column="id" property="id"/>
+        <result column="project_id" property="project_id"/>
+        <result column="course_id" property="course_id"/>
+        <result column="course_name" property="course_name"/>
+        <result column="class_hour" property="class_hour"/>
+        <result column="user_id" property="user_id"/>
+        <result column="requirement_studytime" property="requirement_studytime"/>
+        <result column="total_studytime" property="total_studytime"/>
+        <result column="answer_studytime" property="answer_studytime"/>
+        <result column="train_studytime" property="train_studytime"/>
+        <result column="total_question" property="total_question"/>
+        <result column="yet_answered" property="yet_answered"/>
+        <result column="correct_answered" property="correct_answered"/>
+        <result column="correct_rate" property="correct_rate"/>
+        <result column="finish_status" property="finish_status"/>
+        <result column="create_user" property="create_user"/>
+        <result column="create_time" property="create_time"/>
+        <result column="oper_user" property="oper_user"/>
+        <result column="oper_time" property="oper_time"/>
+    </resultMap>
+
+    <select id="selectList" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+          course_id,course_name
+        FROM project_course_info
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id != null and project_id != ''">
+                AND project_id = #{project_id}
+            </if>
+            <if test="user_id != null and user_id != ''">
+                AND user_id = #{user_id}
+            </if>
+        </trim>
+        <if test="start_num !=null and end_num != null">
+            <include refid="mysqlPage" />
+        </if>
+    </select>
+
+    <!-- 获取项目下课程的数量和应修学时 -->
+    <select id="selectCourseInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        IFNULL(COUNT(id),0) AS course_count,IFNULL(SUM(requirement_studytime),0) AS requirement_studytime
+        FROM project_course_info
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id != null and project_id != ''">
+                AND project_id = #{project_id}
+            </if>
+            <if test="user_id != null and user_id != ''">
+                AND user_id = #{user_id}
+            </if>
+        </trim>
+    </select>
+
+    <select id="selectCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT
+        COUNT(id)
+        FROM project_course_info
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id != null and project_id != ''">
+                AND project_id = #{project_id}
+            </if>
+            <if test="user_id != null and user_id != ''">
+                AND user_id = #{user_id}
+            </if>
+        </trim>
+    </select>
+
+    <!-- 查询课程列表 -->
+    <select id="selectCourseList" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        project_id,user_id,course_id,course_name,total_question
+        FROM project_course_info
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id != null and project_id != ''">
+                AND project_id = #{project_id}
+            </if>
+            <if test="user_id != null and user_id != ''">
+                AND user_id = #{user_id}
+            </if>
+        </trim>
+    </select>
+
+    <!-- 查询课程ids-->
+    <select id="selectCourseIds" parameterType="java.util.Map" resultType="java.lang.String">
+        SELECT
+        course_id
+        FROM project_course_info
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id != null and project_id != ''">
+                AND project_id = #{project_id}
+            </if>
+            <if test="user_id != null and user_id != ''">
+                AND user_id = #{user_id}
+            </if>
+        </trim>
+    </select>
+
+    <!-- 培训详情-->
+    <select id="queryTrainProInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        id as course_id,
+        course_name as course_name,
+        requirement_studytime as requirement,
+        total_studytime as already_course_time
+        FROM project_course_info
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id != null and project_id != ''">
+                AND project_id = #{project_id}
+            </if>
+            <if test="user_id != null and user_id != ''">
+                AND user_id = #{user_id}
+            </if>
+        </trim>
+    </select>
+
+    <!-- 练习详情-->
+    <select id="queryExerciseProInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        id as course_id,
+        course_name as course_name,
+        yet_answered as already_answer_count,
+        total_question as question_count,
+        correct_answered as right_answer_count
+        FROM project_course_info
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id != null and project_id != ''">
+                AND project_id = #{project_id}
+            </if>
+            <if test="user_id != null and user_id != ''">
+                AND user_id = #{user_id}
+            </if>
+        </trim>
+    </select>
+
+    <select id="selectUseCountByCourseId" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT count(user_id) FROM project_course_info WHERE course_id = #{course_id}
+    </select>
+
+    <sql id="baseColumn">
+        id, project_id, course_id, course_name, class_hour, user_id,
+        requirement_studytime, total_studytime, answer_studytime,
+        train_studytime, total_question, yet_answered, correct_answered, correct_rate,
+        finish_status, create_user, create_time, oper_user, oper_time
+    </sql>
+
+    <select id="selectOne" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select
+        <include refid="baseColumn"/>
+        from project_course_info
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id != null and project_id != ''">
+                AND	project_id = #{project_id}
+            </if>
+            <if test="user_id != null and user_id != ''">
+                AND	user_id = #{user_id}
+            </if>
+            <if test="course_id != null and course_id != ''">
+                AND	course_id = #{course_id}
+            </if>
+        </trim>
+        limit 1
+    </select>
+
+    <update id="update">
+        update project_course_info
+        <set>
+            <if test="project_id != null and project_id != ''">
+                project_id = #{project_id},
+            </if>
+            <if test="course_id != null and course_id != ''">
+                course_id = #{course_id},
+            </if>
+            <if test="course_name != null and course_name != ''">
+                course_name = #{course_name},
+            </if>
+            <if test="class_hour != null and class_hour != ''">
+                class_hour = #{class_hour},
+            </if>
+            <if test="user_id != null and user_id != ''">
+                user_id = #{user_id},
+            </if>
+            <if test="requirement_studytime != null">
+                requirement_studytime = #{requirement_studytime},
+            </if>
+            <if test="total_studytime != null">
+                total_studytime = #{total_studytime},
+            </if>
+            <if test="answer_studytime != null">
+                answer_studytime = #{answer_studytime},
+            </if>
+            <if test="train_studytime != null">
+                train_studytime = #{train_studytime},
+            </if>
+            <if test="total_question != null">
+                total_question = #{total_question},
+            </if>
+            <if test="yet_answered != null and yet_answered != ''">
+                yet_answered = #{yet_answered},
+            </if>
+            <if test="correct_answered != null and correct_answered != ''">
+                correct_answered = #{correct_answered},
+            </if>
+            <if test="correct_rate != null">
+                correct_rate = #{correct_rate},
+            </if>
+            <if test="finish_status != null and finish_status != ''">
+                finish_status = #{finish_status},
+            </if>
+            <if test="create_user != null and create_user != ''">
+                create_user = #{create_user},
+            </if>
+            <if test="create_time != null and create_time != ''">
+                create_time = #{create_time},
+            </if>
+            <if test="oper_user != null and oper_user != ''">
+                oper_user = #{oper_user},
+            </if>
+            <if test="oper_time != null and oper_time != ''">
+                oper_time = #{oper_time}
+            </if>
+        </set>
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="id != null and id != ''">
+                AND	id = #{id}
+            </if>
+            <if test="project_id != null and project_id != ''">
+                AND	project_id = #{project_id}
+            </if>
+            <if test="course_id != null and course_id != ''">
+                AND	course_id = #{course_id}
+            </if>
+        </trim>
+    </update>
+
+    <!-- mysql分页查询 -->
+    <sql id="mysqlPage">
+        <![CDATA[
+		    limit #{start_num},#{end_num}
+        ]]>
+    </sql>
+</mapper>

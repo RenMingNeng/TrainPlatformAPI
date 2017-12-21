@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.tp.UserMapper">
+
+	<!-- 通用查询结果集 -->
+	<resultMap id="BaseResultMap" type="com.bossien.entity.User">
+		<id column="id" property="id"/>
+		<result column="user_account" property="user_account"/>
+		<result column="user_passwd" property="user_passwd"/>
+		<result column="user_name" property="user_name"/>
+		<result column="mobile_no" property="mobile_no"/>
+		<result column="company_id" property="company_id"/>
+		<result column="department_id" property="department_id"/>
+		<result column="department_name" property="department_name"/>
+		<result column="is_valid" property="is_valid"/>
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="BaseColumnList">
+		id, user_account, user_passwd, user_name, mobile_no, company_id, department_id, department_name, is_valid
+	</sql>
+
+	<select id="selectOne" parameterType="com.bossien.entity.User" resultMap="BaseResultMap">
+		SELECT
+			<include refid="BaseColumnList"/>
+		FROM user
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="user_account != null and user_account != ''">
+				AND user_account = #{user_account}
+			</if>
+			<if test="user_passwd != null and user_passwd != ''">
+				AND user_passwd = #{user_passwd}
+			</if>
+			<if test="id != null and id != ''">
+				AND id = #{id}
+			</if>
+		</trim>
+		limit 1
+	</select>
+
+	<!-- 查询部门下的学员id -->
+	<select id="selectUserIdByDeptId" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT id FROM user WHERE department_id = #{dept_id}
+	</select>
+
+	<!-- 查询单位下的学员id -->
+	<select id="selectUserIdByCompanyId" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT id FROM user WHERE company_id = #{company_id}
+	</select>
+
+	<select id="getOne"  resultMap="BaseResultMap">
+		SELECT
+		<include refid="BaseColumnList"/>
+		FROM user
+		<trim prefix="WHERE" prefixOverrides="AND">
+
+			<if test="id != null and id != ''">
+				AND id = #{id}
+			</if>
+		</trim>
+		limit 1
+	</select>
+
+	<select id="selectUserIds" parameterType="java.util.Map"  resultType="java.lang.String">
+		SELECT
+		id
+		FROM user
+		<trim prefix="WHERE" prefixOverrides="AND">
+
+			<if test="company_id != null and company_id != ''">
+				AND company_id = #{company_id}
+			</if>
+			<if test="department_id != null and  department_id != ''">
+				AND department_id = #{department_id}
+			</if>
+			<if test="isValid !=null and isValid !=''">
+				and is_valid=#{isValid}
+			</if>
+			<if test="userType !=null and userType !=''">
+				and user_type=#{userType}
+			</if>
+		</trim>
+		ORDER BY create_date desc
+	</select>
+	<!--查询学员数量-->
+	<select id="selectUserCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(id) from user
+		where company_id = #{company_id}
+		<if test="isValid !=null and isValid !=''">
+			and is_valid=#{isValid}
+		</if>
+		<if test="userType !=null and userType !=''">
+			and user_type=#{userType}
+		</if>
+		<if test="deptId != null and deptId != ''">
+			and department_id = #{deptId}
+		</if>
+		<if test="userName != null and userName != ''">
+			and user_name like #{userName}
+		</if>
+	</select>
+</mapper>

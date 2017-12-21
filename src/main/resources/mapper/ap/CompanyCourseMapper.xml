@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.ap.CompanyCourseMapper">
+
+    <resultMap id="BaseResultMap" type="com.bossien.entity.CompanyCourse">
+        <id column="varId" property="varId" jdbcType="VARCHAR"/>
+        <result column="intCompanyId" property="intCompanyId" jdbcType="VARCHAR"/>
+        <result column="intCompanyCourseTypeId" property="intCompanyCourseTypeId" jdbcType="VARCHAR"/>
+        <result column="intCourseId" property="intCourseId" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        varId, intCompanyId, intCompanyCourseTypeId, intCourseId
+    </sql>
+
+    <select id="selectByCompanyId" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT intCourseId FROM ap_company_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="courseId != null and courseId != ''">
+                AND intCourseId = #{courseId}
+            </if>
+            <if test="intCompanyId != null and intCompanyId != ''">
+                AND intCompanyId = #{intCompanyId}
+            </if>
+            <if test="courseTypeIds != null and courseTypeIds != ''">
+                AND find_in_set(intCompanyCourseTypeId, #{courseTypeIds})
+            </if>
+        </trim>
+    </select>
+
+    <!-- 根据公司Id和课程Ids查询课课程Id -->
+    <select id="selectCourseIds" parameterType="java.util.Map" resultType="java.lang.String">
+        SELECT
+        intCourseId
+        FROM
+        ap_company_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="intCompanyId != null and intCompanyId != ''">
+                AND intCompanyId = #{intCompanyId}
+            </if>
+            <if test="intCompanyCourseTypeId != null and intCompanyCourseTypeId != ''">
+                AND intCompanyCourseTypeId = #{intCompanyCourseTypeId}
+            </if>
+            <if test="courseIds != null and courseIds.size>0">
+                AND intCourseId IN
+                <foreach collection="courseIds" index="index" item="courseId" open="(" separator="," close=")">
+                    #{courseId}
+                </foreach>
+            </if>
+        </trim>
+    </select>
+
+    <!--统计公司下的课程数量-->
+    <select id="selectCompanyCourseCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT COUNT(intCourseId) FROM ap_company_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="companyId != null ">
+                AND intCompanyId = #{companyId,jdbcType=INTEGER}
+            </if>
+            <if test="company_id != null ">
+                AND intCompanyId = #{company_id,jdbcType=INTEGER}
+            </if>
+        </trim>
+    </select>
+    <!--统计公司下的课程数量-->
+    <select id="selectIntCourseIdCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT COUNT(intCourseId) FROM ap_company_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="intCourseId != null and intCourseId != ''">
+                AND intCourseId = #{intCourseId}
+            </if>
+        </trim>
+    </select>
+</mapper>

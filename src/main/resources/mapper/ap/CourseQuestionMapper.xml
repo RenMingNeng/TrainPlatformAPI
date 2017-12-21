@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.ap.CourseQuestionMapper">
+
+    <resultMap id="CourseQuestionMap" type="com.bossien.entity.CourseQuestion">
+        <id column="intId" property="intId"></id>
+        <result column="intCourseId" property="intCourseId"></result>
+        <result column="intQuestionId" property="intQuestionId"></result>
+    </resultMap>
+
+    <sql id="baseColumn">
+		intId, intCourseId, intQuestionId
+	</sql>
+
+    <select id="selectQuestionIdList" parameterType="java.util.Map" resultType="java.lang.String">
+        select intQuestionId
+        FROM ex_course_question
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="intCourseIds !=null and intCourseIds.size > 0">
+                <foreach item="intCourseIds" index="index" collection="intCourseIds" open="(" separator="OR" close=")">
+                    intCourseId = #{intCourseIds}
+                </foreach>
+            </if>
+            <if test="intCourseId !=null and intCourseId !=''">
+                and intCourseId = #{intCourseId}
+            </if>
+        </trim>
+        <if test="random !=null and random !=''">
+            limit 0,random
+        </if>
+    </select>
+
+    <select id="selectList" parameterType="java.util.Map" resultMap="CourseQuestionMap">
+        select
+        <include refid="baseColumn"/>
+        FROM ex_course_question
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="intCourseIds !=null and intCourseIds.size > 0">
+                <foreach item="intCourseIds" index="index" collection="intCourseIds" open="(" separator="OR" close=")">
+                    intCourseId = #{intCourseIds}
+                </foreach>
+            </if>
+            <if test="intCourseId !=null and intCourseId !=''">
+                and intCourseId = #{intCourseId}
+            </if>
+        </trim>
+    </select>
+
+</mapper>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.ap.CourseMapper">
+
+    <resultMap id="courseMap" type="com.bossien.entity.Course">
+        <id column="intId" property="intId"></id>
+        <result column="intTypeId" property="intTypeId"></result>
+        <result column="varCode" property="varCode"></result>
+        <result column="varName" property="varName"></result>
+        <result column="varDesc" property="varDesc"></result>
+        <result column="intClassHour" property="intClassHour"></result>
+        <result column="chrType" property="chrType"></result>
+        <result column="varCoverInfo" property="varCoverInfo"></result>
+        <result column="chrPlatformType" property="chrPlatformType"></result>
+        <result column="chrStatus" property="chrStatus"></result>
+        <result column="varCreateUser" property="varCreateUser"></result>
+        <result column="datCreateDate" property="datCreateDate"></result>
+        <result column="varOperUser" property="varOperUser"></result>
+        <result column="datOperDate" property="datOperDate"></result>
+        <result column="varCoverInfo" property="varCoverInfo"></result>
+    </resultMap>
+
+    <sql id="baseColumn">
+        intId, intTypeId, varCode, varName, varDesc,varCoverInfo,intClassHour, chrType, chrPlatformType, chrStatus, varCreateUser, datCreateDate, varOperUser, datOperDate
+    </sql>
+
+    <select id="selectOne" parameterType="java.util.Map" resultMap="courseMap">
+        select
+        <include refid="baseColumn"/>
+        from ex_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            intId = #{intId}
+        </trim>
+        limit 1
+    </select>
+    <select id="selectId" parameterType="java.util.Map" resultMap="courseMap">
+        select
+        intId
+        from ex_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            intId = #{intId}
+        </trim>
+
+    </select>
+
+    <select id="selectList" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        intId as course_id,varName as course_name,varCoverInfo as cover_url
+        FROM ex_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="intIds !=null  and intIds.size() >0">
+                intId in
+                <foreach item="intIds" index="index" collection="intIds" open="(" separator="," close=")">
+                    #{intIds}
+                </foreach>
+            </if>
+            <if test="varName != null and varName != ''">
+                AND varName LIKE #{varName}
+            </if>
+        </trim>
+    </select>
+
+    <select id="selectListCount" parameterType="java.util.Map" resultType="int">
+        SELECT
+        count(1)
+        FROM ex_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="intIds !=null  and intIds.size() >0">
+                intId in
+                <foreach item="intIds" index="index" collection="intIds" open="(" separator="," close=")">
+                    #{intIds}
+                </foreach>
+            </if>
+            <if test="varName != null and varName != ''">
+                AND varName LIKE #{varName}
+            </if>
+        </trim>
+    </select>
+
+    <select id="selectCourseList" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        intId as course_id,varName as course_name,varCoverInfo as cover_url
+        FROM ex_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="intIds !=null and intIds.size>0">
+                intId in
+                <foreach item="intIds" index="index" collection="intIds" open="(" separator="," close=")">
+                    #{intIds}
+                </foreach>
+            </if>
+            <if test="varName != null and varName != ''">
+                AND varName LIKE #{varName}
+            </if>
+        </trim>
+    </select>
+
+    <!-- 查找最近上传的课程 -->
+    <select id="selectLatelyUploadCourse" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+
+     SELECT DISTINCT(intId) as course_id,
+        varName AS course_name,
+        varCoverInfo AS cover_url
+        FROM ex_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="intIds !=null  and intIds.size() >0">
+                intId in
+                <foreach item="intIds" index="index" collection="intIds" open="(" separator="," close=")">
+                    #{intIds}
+                </foreach>
+            </if>
+            <if test="varName != null and varName != ''">
+                AND varName LIKE #{varName}
+            </if>
+        </trim>
+         ORDER BY datCreateDate DESC limit 2
+
+    </select>
+
+</mapper>

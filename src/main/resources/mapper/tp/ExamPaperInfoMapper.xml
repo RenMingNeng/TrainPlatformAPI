@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.tp.ExamPaperInfoMapper">
+
+	<!-- 通用查询结果集 -->
+	<resultMap id="BaseResultMap" type="com.bossien.entity.ExamPaperInfo">
+		<id column="exam_no" property="exam_no"/>
+		<result column="project_id" property="project_id"/>
+		<result column="user_id" property="user_id"/>
+		<result column="role_id" property="role_id"/>
+		<result column="exam_type" property="exam_type"/>
+		<result column="single_score" property="single_score"/>
+		<result column="many_score" property="many_score"/>
+		<result column="judge_score" property="judge_score"/>
+		<result column="fillout_score" property="fillout_score"/>
+		<result column="ques_ans_score" property="ques_ans_score"/>
+		<result column="pass_score" property="pass_score"/>
+		<result column="total_score" property="total_score"/>
+		<result column="exam_duration" property="exam_duration"/>
+		<result column="exam_status" property="exam_status"/>
+		<result column="necessary_hour" property="necessary_hour"/>
+		<result column="create_time" property="create_time"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="com.bossien.entity.ExamPaperInfo">
+		insert into exam_paper_info	(
+		<trim prefix="" prefixOverrides=",">
+			<if test="exam_no !=null and exam_no != ''">,exam_no</if>
+			<if test="user_id !=null and user_id !=''">,user_id</if>
+			<if test="project_id !=null and project_id !=''">,project_id</if>
+			<if test="role_id !=null and role_id != ''">,role_id</if>
+			<if test="exam_type !=null and exam_type !=''">,exam_type</if>
+			<if test="single_score !=null and single_score !=''">,single_score</if>
+			<if test="many_score !=null and many_score !=''">,many_score</if>
+			<if test="judge_score !=null and judge_score !=''">,judge_score</if>
+			<if test="fillout_score !=null and fillout_score !=''">,fillout_score</if>
+			<if test="ques_ans_score !=null and ques_ans_score !=''">,ques_ans_score</if>
+			<if test="pass_score !=null and pass_score !=''"> ,pass_score </if>
+			<if test="total_score !=null and total_score !=''"> ,total_score </if>
+			<if test="necessary_hour !=null and necessary_hour !=''"> ,necessary_hour </if>
+			<if test="exam_duration !=null and exam_duration !=''"> ,exam_duration </if>
+			<if test="exam_status !=null and exam_status !=''"> ,exam_status </if>
+			<if test="create_time !=null and create_time !=''"> ,create_time </if>
+		</trim>
+		) values (
+		<trim prefix="" prefixOverrides=",">
+			<if test="exam_no !=null and exam_no !=''"> ,#{exam_no} </if>
+			<if test="user_id !=null and user_id !=''"> ,#{user_id} </if>
+			<if test="project_id !=null and project_id !=''"> ,#{project_id} </if>
+			<if test="role_id !=null and role_id !=''"> ,#{role_id} </if>
+			<if test="exam_type !=null and exam_type !=''"> ,#{exam_type} </if>
+			<if test="single_score !=null and single_score !=''"> ,#{single_score} </if>
+			<if test="many_score !=null and many_score !=''"> ,#{many_score} </if>
+			<if test="judge_score !=null and judge_score !=''"> ,#{judge_score} </if>
+			<if test="fillout_score !=null and fillout_score !=''"> ,#{fillout_score} </if>
+			<if test="ques_ans_score !=null and ques_ans_score !=''"> ,#{ques_ans_score} </if>
+			<if test="pass_score !=null and pass_score !=''"> ,#{pass_score} </if>
+			<if test="total_score !=null and total_score !=''"> ,#{total_score} </if>
+			<if test="necessary_hour !=null and necessary_hour !=''"> ,#{necessary_hour} </if>
+			<if test="exam_duration !=null and exam_duration !=''"> ,#{exam_duration} </if>
+			<if test="exam_status !=null and exam_status !=''"> ,#{exam_status} </if>
+			<if test="create_time !=null and create_time !=''"> ,#{create_time} </if>
+		</trim>
+		)
+	</insert>
+
+	<!-- 通用查询结果列 -->
+	<sql id="BaseColumnList">
+		exam_no, project_id, user_id, role_id,
+		exam_type,single_score,many_score,judge_score,
+		fillout_score,ques_ans_score,pass_score,total_score,
+		exam_duration,exam_status,necessary_hour,create_time
+	</sql>
+
+	<select id="selectOne" parameterType="com.bossien.entity.ExamPaperInfo" resultMap="BaseResultMap">
+		SELECT
+			<include refid="BaseColumnList"/>
+		FROM exam_paper_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="project_id != null and project_id != ''">
+				AND project_id = #{project_id}
+			</if>
+			<if test="exam_no != null and exam_no != ''">
+				AND exam_no = #{exam_no}
+			</if>
+			<if test="user_id != null and user_id != ''">
+				AND user_id = #{user_id}
+			</if>
+			<if test="exam_type != null and exam_type != ''">
+				AND exam_type = #{exam_type}
+			</if>
+			<if test="exam_status !=null and exam_status !=''">
+				and exam_status = #{exam_status}
+			</if>
+		</trim>
+		limit 1
+	</select>
+
+	<select id="selectCount" resultType="java.lang.Integer">
+		select count(1) FROM exam_paper_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="exam_no !=null and exam_no !=''">
+				and exam_no = #{exam_no}
+			</if>
+			<if test="user_id !=null and user_id !=''">
+				and user_id = #{user_id}
+			</if>
+			<if test="project_id !=null and project_id !=''">
+				and project_id = #{project_id}
+			</if>
+			<if test="role_id !=null and role_id !=''">
+				and role_id = #{role_id}
+			</if>
+			<if test="exam_status !=null and exam_status !=''">
+				and exam_status = #{exam_status}
+			</if>
+			<if test="exam_type !=null and exam_type !=''">
+				and exam_type = #{exam_type}
+			</if>
+		</trim>
+	</select>
+
+	<update id="update" parameterType="string">
+		update exam_paper_info set exam_status = '2' where exam_no=#{examNo}
+	</update>
+	
+</mapper>

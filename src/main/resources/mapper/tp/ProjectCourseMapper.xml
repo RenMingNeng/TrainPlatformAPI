@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.tp.ProjectCourseMapper">
+
+    <resultMap id="projectCourseMap" type="com.bossien.entity.ProjectCourse">
+        <id column="id" property="id"></id>
+        <result column="project_id" property="project_id"></result>
+        <result column="course_id" property="course_id"></result>
+        <result column="course_no" property="course_no"></result>
+        <result column="course_name" property="course_name"></result>
+        <result column="role_id" property="role_id"></result>
+        <result column="role_name" property="role_name"></result>
+        <result column="question_count" property="question_count"></result>
+        <result column="class_hour" property="class_hour"></result>
+        <result column="requirement" property="requirement"></result>
+        <result column="select_count" property="select_count"></result>
+        <result column="create_time" property="create_time"></result>
+        <result column="create_user" property="create_user"></result>
+        <result column="oper_time" property="oper_time"></result>
+    </resultMap>
+
+    <sql id="baseColumn">
+        id, project_id, course_id,course_no, course_name,
+        role_id, role_name, select_count, class_hour, question_count,
+        requirement,oper_user, oper_time
+    </sql>
+
+    <!-- 根据属性查询项目课程 -->
+    <select id="selectList" parameterType="java.util.Map" resultMap="projectCourseMap">
+        select
+          <include refid="baseColumn"/>
+        from
+          project_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id != null and project_id != ''">
+                AND	project_id = #{project_id}
+            </if>
+            <if test="course_name != null and course_name != ''">
+                AND	course_name LIKE #{course_name}
+            </if>
+            <if test="role_id != null and role_id != ''">
+                AND	role_id = #{role_id}
+            </if>
+            group by course_id
+            order by course_id
+        </trim>
+    </select>
+
+    <!-- 根据属性查询项目课程数量 -->
+    <select id="selectCourseCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT
+        COUNT(1)
+        FROM
+        project_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id !=null and project_id !=''">
+                AND project_id=#{project_id}
+            </if>
+            <if test="course_name != null and course_name != ''">
+                AND	course_name LIKE #{course_name}
+            </if>
+            <if test="role_id != null and role_id != ''">
+                AND	role_id = #{role_id}
+            </if>
+        </trim>
+    </select>
+
+
+    <!-- 根据属性查询项目课程数量 -->
+    <select id="selectCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT
+        COUNT(1)
+        FROM
+        (SELECT
+        project_id,
+        course_id,
+        course_name,
+        role_id
+        FROM
+        project_course
+        WHERE project_id = #{project_id} GROUP BY course_id) t
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="course_name != null and course_name != ''">
+                AND	t.course_name LIKE #{course_name}
+            </if>
+            <if test="role_id != null and role_id != ''">
+                AND	t.role_id = #{role_id}
+            </if>
+        </trim>
+    </select>
+
+    <!--通过project_id查询课程数量-->
+    <select id="selectCountByProjectId" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT
+        COUNT(id)
+        FROM
+        project_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id != null and project_id != ''">
+                AND	project_id = #{project_id}
+            </if>
+        </trim>
+    </select>
+
+    <!--通过projectId查询课程列表-->
+    <select id="selectListByParams" parameterType="java.util.Map"  resultType="java.util.Map">
+        SELECT
+        course_id,course_name,course_no,question_count,class_hour
+        FROM
+        project_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id != null and project_id != ''">
+                AND	project_id = #{project_id}
+            </if>
+        </trim>
+        <if test="start_num !=null and end_num != null">
+            <include refid="mysqlPage" />
+        </if>
+    </select>
+
+    <!-- 根据project_id和role_id查询项目角色总学时-->
+    <select id="selectNecessaryHour" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select  IFNULL(sum(requirement),0) necessaryHour FROM project_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id !=null and project_id !=''">
+                AND project_id=#{project_id}
+            </if>
+            <if test="role_id !=null and role_id !=''">
+                AND role_id=#{role_id}
+            </if>
+        </trim>
+    </select>
+
+    <!-- 根据project_id和role_id删除项目课程-->
+    <delete id="deleteBatch" parameterType="java.util.Map">
+        DELETE FROM project_course WHERE   role_id = #{role_id}
+        <if test="project_id!=null and project_id!='' ">
+            and project_id = #{project_id}
+        </if>
+        <if test="ids!=null and ids.size>0 ">
+            AND id IN
+            <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+        <if test="courseIds!=null and courseIds.size>0 ">
+            AND course_id IN
+            <foreach item="id" index="index" collection="courseIds" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+    </delete>
+
+    <!-- 查询项目课程ids集合 -->
+    <select id="selectCourseIds" parameterType="java.util.Map" resultType="java.lang.String">
+        select course_id AS courseId from project_course WHERE project_id = #{project_id}
+        <if test="role_id != null and role_id != ''">
+            AND role_id = #{role_id}
+        </if>
+        group by course_id
+    </select>
+
+    <!-- 查询项目课程信息集合 -->
+    <select id="selectProjectCourseInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+          project_id AS project_id,
+          course_id AS courseId,
+          course_name AS courseName,
+          class_hour AS  classHour,
+          requirement AS requirementStudytime,
+          question_count AS totalQuestion,
+          create_user AS createUser,
+          oper_user AS operUser
+       FROM
+         project_course
+       WHERE
+         project_id = #{project_id}
+       AND
+         role_id = #{role_id}
+        <if test="courseIds !=null and courseIds.size>0">
+            AND
+            course_id IN
+            <foreach item="id" index="index" collection="courseIds" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+
+    </select>
+
+    <!-- 根据项目Id和角色Id查询项目课程总学时和总题量 -->
+    <select id="selectProjectCourseMap" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        IFNULL(SUM(requirement),0) AS requirementStudytime,
+        IFNULL(SUM(question_count),0) AS totalQuestion
+        FROM
+        project_course
+        WHERE
+        project_id = #{project_id}
+        AND
+        role_id = #{role_id}
+    </select>
+      <!--修改未发布和未开始项目时,确认角色减少时是否有相关课程的存在-->
+    <select id="selectIds" parameterType="java.util.Map" resultType="java.lang.String">
+        select id from project_course where
+        project_id= #{project_id}
+        and role_id not in
+        <foreach item="role_id" index="index" collection="role_ids" open="(" separator="," close=")">
+             #{role_id}
+        </foreach>
+    </select>
+    <!--根据id删除-->
+    <delete id="delete" parameterType="java.lang.String">
+        DELETE FROM  project_course where id=#{id}
+    </delete>
+
+    <delete id="deleteBatchByCourseIds" parameterType="java.util.Map">
+        DELETE FROM project_course WHERE project_id = #{project_id} and course_id in
+        <foreach collection="courseIds" index="index" item="courseId" open="(" separator="," close=")">
+            #{courseId}
+        </foreach>
+    </delete>
+
+    <!--根据project_id删除-->
+    <delete id="deleteProjectId" parameterType="java.util.Map">
+        DELETE FROM  project_course where project_id=#{project_id}
+        <if test="role_id != null and role_id !=''">
+            and role_id != #{role_id}
+        </if>
+        <if test="role_ids != null and role_ids.size>0">
+            and role_id in
+            <foreach collection="role_ids" index="index" item="role_id" open="(" separator="," close=")">
+                #{role_id}
+            </foreach>
+        </if>
+    </delete>
+
+    <delete id="deleteProjectCourse" parameterType="java.util.Map">
+        DELETE FROM  project_course where project_id=#{project_id} AND course_id IN
+        <foreach collection="courseIds" item="courseId" index="index" open="(" separator="," close=")">
+            #{courseId}
+        </foreach>
+    </delete>
+
+    <!-- 高级设置中查询项目课程信息 -->
+    <select id="selectProjectCourse" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+           id ,
+          project_id AS project_id,
+          course_id AS courseId,
+          course_no AS courseNo,
+          course_name AS courseName,
+          question_count AS questionCount,
+          class_hour AS classHour
+        FROM
+          project_course
+        WHERE project_id = #{project_id}
+        GROUP BY course_id
+        ORDER BY course_no
+        <!--<include refid="CommonMapper.mysqlPage" />-->
+    </select>
+    <!--获取每页的课程id集合-->
+    <select id="selectProjectCourseIds" parameterType="java.util.Map" resultType="java.lang.String">
+       SELECT
+        course_id
+        FROM
+        project_course
+        WHERE project_id = #{project_id}
+        GROUP BY course_id
+        ORDER BY create_time DESC
+       limit #{startNum},#{endNum}
+    </select>
+
+    <select id="selectByProjectIdAndRoleId" parameterType="java.util.Map" resultMap="projectCourseMap">
+        select
+        course_id,role_id,role_name,requirement,select_count
+        FROM project_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id !=null and project_id !=''">
+                AND project_id=#{project_id}
+            </if>
+            <if test="role_id !=null and role_id !=''">
+                AND role_id=#{role_id}
+            </if>
+            <if test="project_id !=null and project_id !=''">
+                AND project_id=#{project_id}
+            </if>
+            <if test="role_id !=null and role_id !=''">
+                AND role_id=#{role_id}
+            </if>
+        </trim>
+    </select>
+
+    <select id="selectProjectCourseCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT
+         COUNT(1)
+        FROM
+         (SELECT
+          course_id AS courseId
+          FROM
+          project_course
+        WHERE project_id = #{project_id}
+        GROUP BY course_id) pc
+    </select>
+
+
+    <!-- 高级设置中查询项目课程信息 -->
+    <select id="selectProjectRoleAndCourse" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        role_id AS role_id,
+        requirement,
+        select_count AS selectCount
+        FROM
+        project_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id != null and project_id != ''">
+                AND	project_id = #{project_id}
+            </if>
+            <if test="course_id != null and course_id != ''">
+                AND	course_id = #{course_id}
+            </if>
+        </trim>
+    </select>
+
+    <!-- 根据项目Id获取角色Id集合 -->
+    <select id="selectRoleIds" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+        role_id AS role_id
+        FROM
+        project_course
+        WHERE project_id = #{project_id}
+        group by role_id
+    </select>
+     <!--根据project_id查询课程集合-->
+    <select id="selectProjectCourses" parameterType="java.util.Map" resultMap="projectCourseMap">
+        select
+        <include refid="baseColumn"/>
+        from
+        project_course
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id != null and project_id != ''">
+                AND	project_id = #{project_id}
+            </if>
+            <if test="role_id != null and role_id !=''">
+                and role_id != #{role_id}
+            </if>
+        </trim>
+
+    </select>
+
+    <!-- mysql分页查询 -->
+    <sql id="mysqlPage">
+        <![CDATA[
+		    limit #{start_num},#{end_num}
+        ]]>
+    </sql>
+</mapper>

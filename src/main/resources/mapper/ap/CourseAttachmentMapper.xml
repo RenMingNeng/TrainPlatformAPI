@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.ap.CourseAttachmentMapper">
+
+    <resultMap id="courseAttachmentMap" type="com.bossien.entity.CourseAttachment">
+        <id column="intId" property="intId"></id>
+        <result column="intCourseId" property="intCourseId"></result>
+        <result column="intAttachmentId" property="intAttachmentId"></result>
+    </resultMap>
+
+    <sql id="baseColumn">
+        intId, intCourseId, intAttachmentId
+    </sql>
+
+    <select id="selectList" parameterType="java.util.Map" resultMap="courseAttachmentMap">
+        select
+        <include refid="baseColumn"/>
+        from ex_course_attachment
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="intCourseId !=null and intCourseId !='' ">
+                intCourseId = #{intCourseId}
+            </if>
+        </trim>
+    </select>
+   <!--通过courseId查询附件ids-->
+    <select id="selectAttachmentIds" parameterType="java.util.Map" resultType="java.lang.String">
+        select
+        intAttachmentId
+        from ex_course_attachment
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="course_id !=null and course_id !='' ">
+                intCourseId = #{course_id}
+            </if>
+        </trim>
+    </select>
+
+</mapper>

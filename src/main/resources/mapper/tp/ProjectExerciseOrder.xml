@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.tp.ProjectExerciseOrderMapper">
+
+	<!-- 通用查询结果集 -->
+	<resultMap id="BaseResultMap" type="com.bossien.entity.ProjectExerciseOrder">
+		<id column="id" property="id"/>
+		<result column="project_id" property="project_id"/>
+		<result column="user_id" property="user_id"/>
+		<result column="total_question" property="total_question"/>
+		<result column="yet_answered" property="yet_answered"/>
+		<result column="not_answered" property="not_answered"/>
+		<result column="correct_answered" property="correct_answered"/>
+		<result column="fail_answered" property="fail_answered"/>
+		<result column="correct_rate" property="correct_rate"/>
+		<result column="answer_studytime" property="answer_studytime"/>
+	</resultMap>
+
+	<!-- 获取练习答题记录 -->
+	<select id="selectOne" parameterType="com.bossien.entity.ProjectExerciseOrder" resultMap="BaseResultMap">
+		SELECT
+		total_question,yet_answered,(total_question - yet_answered) as not_answered,
+			correct_answered,fail_answered,answer_studytime
+		FROM project_exercise_order
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="project_id != null and project_id != ''">
+				AND project_id = #{project_id}
+			</if>
+			<if test="user_id != null and user_id != ''">
+				AND user_id = #{user_id}
+			</if>
+		</trim>
+		limit 1
+	</select>
+
+	<!-- 任务排行榜 -->
+	<select id="selectUserRank" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+		p.rownum,
+		p.user_name,
+		p.answer_studytime,
+		p.yet_answered,
+		p.correct_answered
+		FROM
+		(SELECT
+		@rownum := @rownum + 1 AS rownum,
+		e.user_name,
+		e.answer_studytime,
+		e.yet_answered,
+		e.correct_answered
+		FROM
+		project_exercise_order e,
+		(SELECT @rownum := 0) r
+		where e.project_id = #{project_id}
+		order by e.answer_studytime desc
+		) p
+	</select>
+
+	<!-- 任务排行榜数量 -->
+	<select id="selectUserRankCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+		SELECT
+		count(1)
+		FROM
+		project_exercise_order
+		WHERE project_id = #{project_id}
+	</select>
+
+	<update id="update" parameterType="com.bossien.entity.ProjectExerciseOrder">
+		update project_exercise_order
+		<trim prefix="set" prefixOverrides=",">
+			<if test="total_question !=null"> ,total_question = #{total_question} </if>
+			<if test="yet_answered !=null"> ,yet_answered = #{yet_answered} </if>
+			<if test="not_answered !=null"> ,not_answered = #{not_answered} </if>
+			<if test="correct_answered !=null"> ,correct_answered = #{correct_answered} </if>
+			<if test="fail_answered !=null"> ,fail_answered = #{fail_answered} </if>
+			<if test="correct_rate !=null"> ,correct_rate = #{correct_rate} </if>
+			<if test="answer_studytime !=null"> ,answer_studytime = #{answer_studytime} </if>
+			<if test="oper_user !=null and oper_user !=''"> ,oper_user = #{oper_user} </if>
+			<if test="oper_time !=null and oper_time !=''"> ,oper_time = #{oper_time} </if>
+		</trim>
+		where project_id=#{project_id}
+		<if test="user_id != null and user_id !=''">
+			and user_id=#{user_id}
+		</if>
+		<if test="role_id != null and role_id !=''">
+			and role_id=#{role_id}
+		</if>
+	</update>
+</mapper>

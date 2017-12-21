@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.tp.ProjectBasicMapper">
+
+	<!-- 通用查询结果集 -->
+	<resultMap id="BaseResultMap" type="com.bossien.entity.ProjectBasic">
+		<id column="id" property="id"/>
+		<result column="project_name" property="project_name"/>
+		<result column="subject_id" property="subject_id"/>
+		<result column="project_type" property="project_type"/>
+		<result column="train_period" property="train_period"/>
+		<result column="project_mode" property="project_mode"/>
+		<result column="project_status" property="project_status"/>
+		<result column="project_train_info" property="project_train_info"/>
+		<result column="project_exercise_info" property="project_exercise_info"/>
+		<result column="project_exam_info" property="project_exam_info"/>
+		<result column="project_open" property="project_open"/>
+		<result column="create_user" property="create_user"/>
+		<result column="create_time" property="create_time"/>
+		<result column="oper_user" property="oper_user"/>
+		<result column="oper_time" property="oper_time"/>
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="BaseColumnList">
+		id, project_name, project_train_info, project_exercise_info,
+		project_exam_info,
+		create_user,create_time,oper_user,oper_time
+	</sql>
+
+	<select id="selectOne"  resultMap="BaseResultMap">
+		SELECT
+			<include refid="BaseColumnList"/>
+		FROM project_basic
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="id != null and id != ''">
+				AND id = #{id}
+			</if>
+		</trim>
+		limit 1
+	</select>
+
+	<!-- 更新项目状态 -->
+	<update id="checkProjectStatus" parameterType="java.util.Map">
+		UPDATE project_basic
+		<set>
+			<if test="projectStatus != '' and projectStatus != null">
+				project_status  = #{projectStatus},
+			</if>
+		</set>
+		<where>
+			id IN
+			<foreach item="item" index="index" collection="projectIds" separator="," open="(" close=")">
+				#{item}
+			</foreach>
+		</where>
+	</update>
+	
+</mapper>

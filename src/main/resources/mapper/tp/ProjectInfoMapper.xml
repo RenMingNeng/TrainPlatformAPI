@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.tp.ProjectInfoMapper">
+
+	<!-- 通用查询结果集 -->
+	<resultMap id="proInfoMap" type="com.bossien.entity.ProjectInfo">
+		<id column="id" property="id"/>
+		<result column="subject_name" property="subject_name"/>
+		<result column="project_name" property="project_name"/>
+		<result column="role_name" property="role_name"/>
+		<result column="project_start_time" property="project_start_time"/>
+		<result column="project_end_time" property="project_end_time"/>
+		<result column="project_train_time" property="project_train_time"/>
+		<result column="project_exercise_time" property="project_exercise_time"/>
+		<result column="project_exam_time" property="project_exam_time"/>
+		<result column="intTrainPeriod" property="intTrainPeriod"/>
+		<result column="intRetestTime" property="intRetestTime"/>
+		<result column="person_count" property="person_count"/>
+		<result column="project_mode" property="project_mode"/>
+		<result column="project_type" property="project_type"/>
+		<result column="project_status" property="project_status"/>
+		<result column="create_user" property="create_user"/>
+		<result column="create_time" property="create_time"/>
+		<result column="oper_user" property="oper_user"/>
+		<result column="oper_time" property="oper_time"/>
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="BaseColumnList">
+		id, subject_name,project_name,role_name,
+		 project_start_time, project_end_time,project_train_time,project_exercise_time,
+		 project_exam_time,intTrainPeriod,intRetestTime,person_count,project_mode,
+		project_type,project_status,
+		create_user,create_time,oper_user,oper_time
+	</sql>
+
+	<select id="selectList"  parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			<include refid="BaseColumnList"/>
+		FROM project_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="projectIds != null and projectIds.size>0">
+				AND id in
+				<foreach collection="projectIds" index="index" item="project_id" open="(" separator="," close=")">
+					#{project_id}
+				</foreach>
+			</if>
+			<if test="projectTypes != null and projectTypes.size>0">
+				AND project_type in
+				<foreach collection="projectTypes" index="index" item="project_Type" open="(" separator="," close=")">
+					#{project_Type}
+				</foreach>
+			</if>
+			<if test="project_status != null and project_status != ''">
+				AND project_status = #{project_status}
+			</if>
+			<if test="project_train != null and project_train != ''">
+				AND project_Type != #{project_train}
+			</if>
+			<if test="project_no_start != null and project_no_start != '' and project_start != null and project_start != ''">
+				AND (project_status = #{project_no_start} or project_status = #{project_start})
+			</if>
+		</trim>
+		order by create_time DESC
+	</select>
+
+	<select id="selectCount"  parameterType="java.util.Map" resultType="java.lang.Integer">
+		SELECT
+		count(id)
+		FROM project_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="projectIds != null and projectIds.size>0">
+				and id in
+				<foreach collection="projectIds" index="index" item="project_id" open="(" separator="," close=")">
+					#{project_id}
+				</foreach>
+			</if>
+			<if test="projectTypes != null and projectTypes.size>0">
+				and project_type in
+				<foreach collection="projectTypes" index="index" item="project_Type" open="(" separator="," close=")">
+					#{project_Type}
+				</foreach>
+			</if>
+			<if test="project_status != null and project_status != ''">
+				AND project_status = #{project_status}
+			</if>
+		</trim>
+	</select>
+
+	<select id="selectCountByParams" parameterType="java.util.Map" resultType="java.lang.Integer">
+		SELECT
+		COUNT(id)
+		FROM project_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="project_ids !=null and project_ids.size() > 0">
+				id IN
+				<foreach item="item" index="index" collection="project_ids" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="project_status != null and project_status != ''">
+				AND project_status = #{project_status}
+			</if>
+		</trim>
+	</select>
+
+	<select id="selectListByParams" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			<include refid="BaseColumnList"/>
+		FROM project_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="project_ids !=null and project_ids.size() > 0">
+				id IN
+				<foreach item="item" index="index" collection="project_ids" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="project_status != null and project_status != ''">
+				AND project_status = #{project_status}
+			</if>
+		</trim>
+		<if test="startNum !=null and endNum != null">
+			<include refid="mysqlPage" />
+		</if>
+	</select>
+
+	<select id="selectProjectListPage"  parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+		id,project_name,
+		project_train_time,project_exercise_time,
+		project_exam_time,person_count,
+		project_type,project_status
+		FROM project_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="projectIds != null and projectIds.size>0">
+				id in
+				<foreach collection="projectIds" index="index" item="project_id" open="(" separator="," close=")">
+					#{project_id}
+				</foreach>
+			</if>
+			<if test="project_status != null and project_status != ''">
+				AND project_status = #{project_status}
+			</if>
+		</trim>
+		order by create_time DESC
+	</select>
+
+	<select id="selectProjectList"  parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+		id,project_name,
+		project_train_time,project_exercise_time,
+		project_exam_time,person_count,
+		project_type,project_status
+		FROM project_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="projectIds != null and projectIds.size>0">
+				id in
+				<foreach collection="projectIds" index="index" item="project_id" open="(" separator="," close=")">
+					#{project_id}
+				</foreach>
+			</if>
+			<if test="project_status != null and project_status != ''">
+				AND project_status = #{project_status}
+			</if>
+		</trim>
+		order by create_time DESC
+	</select>
+
+	<!-- 通过主键id查询项目信息-->
+	<select id="selectProjectInfoById" parameterType="java.lang.String" resultMap="proInfoMap">
+		select id,subject_name,
+		project_name,role_name,
+		project_start_time,project_end_time,
+		project_train_time,project_exercise_time,
+		project_exam_time,intTrainPeriod,
+		intRetestTime,person_count,project_mode,
+		project_type,project_status,
+		create_user,oper_user,create_time
+		FROM project_info where id=#{id}
+	</select>
+
+	<!--根据状态和类型查询projectIds-->
+	<select id="selectProjectIds" parameterType="java.util.Map" resultType="java.lang.String">
+		select id from project_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="projectIds !=null  and projectIds.size >0">
+				and  id in
+				<foreach item="item" index="index" collection="projectIds" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="projectStatus !=null  and projectStatus.size >0">
+				and  project_status in
+				<foreach item="item" index="index" collection="projectStatus" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="projectTypes !=null  and projectTypes.size >0">
+				and  project_type IN
+				<foreach item="item" index="index" collection="projectTypes" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+		</trim>
+	</select>
+
+	<!-- 获取当前需要更新状态的未开始项目id -->
+	<select id="getIdsByStatus" parameterType="java.util.Map" resultType="java.lang.String">
+		SELECT id FROM project_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="projectIds !=null  and projectIds.size >0">
+				id in
+				<foreach item="item" index="index" collection="projectIds" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="currentTime != '' and currentTime != null">
+				and project_start_time <![CDATA[ <= ]]> #{currentTime}
+			</if>
+			<if test="currentTime_1 != '' and currentTime_1 != null">
+				and project_end_time <![CDATA[ <= ]]> #{currentTime_1}
+			</if>
+			<if test="projectStatus != '' and projectStatus != null">
+				and project_status = #{projectStatus}
+			</if>
+		</trim>
+	</select>
+
+	<!-- 修改项目状态 -->
+	<update id="checkProjectStatus" parameterType="java.util.Map">
+		UPDATE project_info
+		<set>
+			<if test="projectStatus != '' and projectStatus != null">
+				project_status  = #{projectStatus},
+			</if>
+		</set>
+		<where>
+			id IN
+			<foreach item="item" index="index" collection="projectIds" separator="," open="(" close=")">
+				#{item}
+			</foreach>
+		</where>
+	</update>
+
+	<!-- mysql分页查询 -->
+	<sql id="mysqlPage">
+		<![CDATA[
+		    limit #{start_num},#{end_num}
+        ]]>
+	</sql>
+</mapper>

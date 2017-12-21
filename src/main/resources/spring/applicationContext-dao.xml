@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+	
+	<!-- 引入配置文件 -->  
+    <context:property-placeholder location="classpath:properties/*.properties"/>
+
+	<!-- 基础数据库 -->
+	<bean name="dataSource_res" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="url" value="${res.jdbc.url}" />
+		<property name="username" value="${res.jdbc.username}" />
+		<property name="password" value="${res.jdbc.password}" />
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="initialSize" value="1" /><!-- 初始化连接大小 -->
+		<property name="maxActive" value="200" /><!-- 连接池最大使用连接数量 -->
+		<property name="minIdle" value="1" /><!-- 连接池最小空闲 -->
+		<property name="maxWait" value="60000" /><!-- 获取连接最大等待时间 -->
+		<property name="validationQuery" value="SELECT 1" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="true" />
+		<property name="testOnReturn" value="true" />
+		<property name="timeBetweenEvictionRunsMillis" value="60000" /><!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="300000" /><!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="removeAbandoned" value="true" /><!-- 打开removeAbandoned功能 -->
+		<property name="removeAbandonedTimeout" value="1800" /><!-- 1800秒，也就是30分钟 -->
+		<property name="logAbandoned" value="false" /><!-- 关闭abanded连接时输出错误日志 -->
+		<property name="filters" value="stat" /><!-- 监控数据库 -->
+		<property name="proxyFilters">
+			<list>
+				<ref bean="wall-filter"/>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 业务数据库 -->
+	<bean name="dataSource_bus" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="url" value="${bus.jdbc.url}" />
+		<property name="username" value="${bus.jdbc.username}" />
+		<property name="password" value="${bus.jdbc.password}" />
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="initialSize" value="1" /><!-- 初始化连接大小 -->
+		<property name="maxActive" value="200" /><!-- 连接池最大使用连接数量 -->
+		<property name="minIdle" value="1" /><!-- 连接池最小空闲 -->
+		<property name="maxWait" value="60000" /><!-- 获取连接最大等待时间 -->
+		<property name="validationQuery" value="SELECT 1" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="true" />
+		<property name="testOnReturn" value="true" />
+		<property name="timeBetweenEvictionRunsMillis" value="60000" /><!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="300000" /><!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="removeAbandoned" value="true" /><!-- 打开removeAbandoned功能 -->
+		<property name="removeAbandonedTimeout" value="1800" /><!-- 1800秒，也就是30分钟 -->
+		<property name="logAbandoned" value="false" /><!-- 关闭abanded连接时输出错误日志 -->
+		<property name="filters" value="stat" /><!-- 监控数据库 -->
+		<property name="proxyFilters">
+			<list>
+				<ref bean="wall-filter"/>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 基础数据库 sqlSessionFactory -->
+	<bean id="sqlSessionFactory_res" class="com.baomidou.mybatisplus.spring.MybatisSqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource_res"/>
+		<property name="mapperLocations">
+			<list>
+				<value>classpath*:mapper/ex/*.xml</value>
+				<value>classpath*:mapper/ap/*.xml</value>
+			</list>
+		</property>
+		<property name="configLocation" value="classpath:xml/mybatis-config.xml"/>
+		<property name="typeAliasesPackage" value="com.bossien.entity" />
+		<property name="plugins">
+			<array>
+				<!-- 分页插件配置 -->
+				<bean id="paginationInterceptor"
+					  class="com.baomidou.mybatisplus.plugins.PaginationInterceptor">
+					<property name="dialectType" value="mysql" />
+				</bean>
+			</array>
+		</property>
+	</bean>
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.bossien.mapper.ap, com.bossien.mapper.ex"/>
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory_res"/>
+	</bean>
+
+	<!-- 业务数据库 sqlSessionFactory -->
+	<bean id="sqlSessionFactory_bus" class="com.baomidou.mybatisplus.spring.MybatisSqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource_bus"/>
+		<property name="mapperLocations">
+			<list>
+				<value>classpath*:mapper/tp/*.xml</value>
+			</list>
+		</property>
+		<property name="configLocation" value="classpath:xml/mybatis-config.xml"/>
+		<property name="typeAliasesPackage" value="com.bossien.entity" />
+		<property name="plugins">
+			<array>
+				<!-- 分页插件配置 -->
+				<bean id="paginationInterceptor"
+					  class="com.baomidou.mybatisplus.plugins.PaginationInterceptor">
+					<property name="dialectType" value="mysql" />
+				</bean>
+			</array>
+		</property>
+	</bean>
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.bossien.mapper.tp"/>
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory_bus"/>
+	</bean>
+
+	<bean id="wallConfig" class="com.alibaba.druid.wall.WallConfig">
+		<property name="multiStatementAllow" value="true"/>     <!-- 是否允许一次执行多条语句, 允许 -->
+		<property name="selectAllColumnAllow" value="false"/>   <!-- 是否允许执行select * from t 这样的语句. false 表示不允许执行 -->
+		<property name="selectUnionCheck" value="true"/>        <!-- 检测 select union 不允许union操作 -->
+		<property name="mustParameterized" value="true"/>       <!-- 不允许出现不进行参数化的sql 如： where 1=1 -->
+	</bean>
+
+	<!-- 重新定义过滤器 -->
+	<bean id="wall-filter" class="com.alibaba.druid.wall.WallFilter">
+		<property name="config" ref="wallConfig"/>
+	</bean>
+
+	<bean id="druid-stat-interceptor" class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor"/>
+	<bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut" scope="prototype">
+		<property name="patterns">
+			<list>
+				<value>com.bossien.*.service.*</value>
+			</list>
+		</property>
+	</bean>
+	<aop:config>
+		<aop:advisor advice-ref="druid-stat-interceptor" pointcut-ref="druid-stat-pointcut"/>
+	</aop:config>
+
+	<aop:aspectj-autoproxy/>
+
+	<!-- role -->
+	<bean id="super_vise" class="com.bossien.entity.Role">
+		<constructor-arg name="id" value="ffefa04c-d274-4694-ba49-904f790c234b"/>
+		<constructor-arg name="role_name" value="super_vise"/>
+		<constructor-arg name="role_desc" value="监管人员"/>
+	</bean>
+
+	<bean id="company_admin" class="com.bossien.entity.Role">
+		<constructor-arg name="id" value="d685f6c9-8a25-4fc1-9dbd-8b684ec70e3a"/>
+		<constructor-arg name="role_name" value="company_admin"/>
+		<constructor-arg name="role_desc" value="单位管理员"/>
+	</bean>
+
+	<bean id="company_user" class="com.bossien.entity.Role">
+		<constructor-arg name="id" value="5b9e9b3e-9ca5-4dfd-91f0-de584d439121"/>
+		<constructor-arg name="role_name" value="company_user"/>
+		<constructor-arg name="role_desc" value="学员"/>
+	</bean>
+
+	<!-- spring event listener -->
+	<bean id="eventListener" class="com.bossien.listener.EventListener"/>
+</beans>

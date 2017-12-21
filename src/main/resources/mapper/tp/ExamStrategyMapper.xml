@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.tp.ExamStrategyMapper">
+
+	<!-- 通用查询结果集 -->
+	<resultMap id="BaseResultMap" type="com.bossien.entity.ExamStrategy">
+		<id column="id" property="id"/>
+		<result column="project_id" property="project_id"/>
+		<result column="role_id" property="role_id"/>
+		<result column="role_name" property="role_name"/>
+		<result column="total_score" property="total_score"/>
+		<result column="necessary_hour" property="necessary_hour"/>
+		<result column="exam_duration" property="exam_duration"/>
+		<result column="pass_score" property="pass_score"/>
+		<result column="single_count" property="single_count"/>
+		<result column="single_score" property="single_score"/>
+		<result column="single_all_count" property="single_all_count"/>
+		<result column="many_count" property="many_count"/>
+		<result column="many_score" property="many_score"/>
+		<result column="many_all_count" property="many_all_count"/>
+		<result column="judge_count" property="judge_count"/>
+		<result column="judge_score" property="judge_score"/>
+		<result column="judge_all_count" property="judge_all_count"/>
+		<result column="fillout_count" property="fillout_count"/>
+		<result column="fillout_score" property="fillout_score"/>
+		<result column="ques_ans_count" property="ques_ans_count"/>
+		<result column="ques_ans_score" property="ques_ans_score"/>
+		<result column="create_user" property="create_user"/>
+		<result column="create_time" property="create_time"/>
+		<result column="oper_user" property="oper_user"/>
+		<result column="oper_time" property="oper_time"/>
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="BaseColumnList">
+		id, project_id, role_id, role_name,
+		total_score,necessary_hour,exam_duration,pass_score,
+		single_count,single_score,single_all_count,many_count,
+		many_score,many_all_count,judge_count,judge_score,
+		judge_all_count,fillout_count,fillout_score,ques_ans_count,
+		ques_ans_score,
+		create_user,create_time,oper_user,oper_time
+	</sql>
+
+	<select id="selectOne" parameterType="com.bossien.entity.ExamStrategy" resultMap="BaseResultMap">
+		SELECT
+			<include refid="BaseColumnList"/>
+		FROM exam_strategy
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="project_id != null and project_id != ''">
+				AND project_id = #{project_id}
+			</if>
+			<if test="role_id != null and role_id != ''">
+				AND role_id = #{role_id}
+			</if>
+		</trim>
+		limit 1
+	</select>
+
+</mapper>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.ap.QuestionMapper">
+
+    <resultMap id="questionMap" type="com.bossien.entity.Question">
+        <id column="intId" property="int_id"></id>
+        <result column="varNo" property="var_no"></result>
+        <result column="varTitle" property="var_title"></result>
+        <result column="varContent" property="var_content"></result>
+        <result column="chrCategory" property="chr_category"></result>
+        <result column="chrType" property="chr_type"></result>
+        <result column="intDifficult" property="int_difficult"></result>
+        <result column="chrValid" property="chr_valid"></result>
+        <result column="varAnswer" property="var_answer"></result>
+        <result column="varAnswerDesc" property="var_answer_desc"></result>
+        <result column="varSource" property="var_source"></result>
+        <result column="varAnalysis" property="var_analysis"></result>
+        <result column="varExamPoint" property="var_exam_point"></result>
+        <result column="varCreateUser" property="var_create_user"></result>
+        <result column="datCreateDate" property="dat_create_date"></result>
+        <result column="varOperUser" property="var_oper_user"></result>
+        <result column="datOperDate" property="dat_oper_date"></result>
+    </resultMap>
+
+    <sql id="baseColumn">
+		intId,varNo,varTitle,varContent,chrCategory,chrType,intDifficult,chrValid,varAnswer,varAnswerDesc,varSource,
+		varAnalysis,varExamPoint,varCreateUser,datCreateDate,varOperUser,datOperDate
+	</sql>
+
+    <select id="selectList" parameterType="java.util.Map" resultMap="questionMap">
+        select
+        <include refid="baseColumn"/>
+        FROM ex_question
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="intIds !=null and intIds.size() != 0">
+                and intId in
+                <foreach item="intIds" index="index" collection="intIds" open="(" separator="," close=")">
+                    #{intIds}
+                </foreach>
+            </if>
+            <if test="chrType !=null and chrType !=''">
+                and chrType = #{chrType}
+            </if>
+            <if test="chrValid !=null and chrValid !=''">
+                and chrValid = #{chrValid}
+            </if>
+        </trim>
+        order by chrType
+    </select>
+
+    <select id="selectQuestionsList" parameterType="java.util.Map" resultMap="questionMap">
+        select
+        <include refid="baseColumn"/>
+        FROM ex_question
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="intIds !=null and intIds.size() != 0">
+                and intId in
+                <foreach item="intIds" index="index" collection="intIds" open="(" separator="," close=")">
+                    #{intIds}
+                </foreach>
+            </if>
+            <if test="chrType !=null and chrType !=''">
+                and chrType = #{chrType}
+            </if>
+            <if test="chrValid !=null and chrValid !=''">
+                and chrValid = #{chrValid}
+            </if>
+        </trim>
+        order by datCreateDate desc
+    </select>
+
+    <select id="selectCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+        count(1)
+        FROM ex_question
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="intIds !=null and intIds.size() != 0">
+                and intId in
+                <foreach item="intIds" index="index" collection="intIds" open="(" separator="," close=")">
+                    #{intIds}
+                </foreach>
+            </if>
+            <if test="chrType !=null and chrType !=''">
+                and chrType = #{chrType}
+            </if>
+            <if test="chrValid !=null and chrValid !=''">
+                and chrValid = #{chrValid}
+            </if>
+        </trim>
+    </select>
+
+    <select id="selectOne" parameterType="com.bossien.entity.Question" resultMap="questionMap">
+        select
+        <include refid="baseColumn"/>
+        FROM ex_question
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="intId !=null and intId !=''">
+                intId = #{intId}
+            </if>
+        </trim>
+    </select>
+
+    <select id="selectByIds" parameterType="com.bossien.entity.Question" resultMap="questionMap">
+        select
+        <include refid="baseColumn"/>
+        FROM ex_question
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="ids !=null and ids.size>0">
+                AND
+                intId IN
+                <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </trim>
+    </select>
+
+</mapper>

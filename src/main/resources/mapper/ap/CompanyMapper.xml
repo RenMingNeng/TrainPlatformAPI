@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.ap.CompanyMapper">
+
+	<!-- 通用查询结果集 -->
+	<resultMap id="BaseResultMap" type="com.bossien.entity.Company">
+		<id column="intId" property="intId"/>
+		<result column="varCode" property="varCode"/>
+		<result column="varName" property="varName"/>
+		<result column="chrIsValid" property="chrIsValid"/>
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="BaseColumnList">
+		intId, varCode, varName, chrIsValid
+	</sql>
+
+	<select id="selectByIntId" resultMap="BaseResultMap">
+		SELECT
+			<include refid="BaseColumnList"/>
+		FROM ap_company
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="intId != null and intId != ''">
+				AND intId = #{intId}
+			</if>
+		</trim>
+		limit 1
+	</select>
+
+	<select id="getChildCompanyIds" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT getCChiList ( #{companyId} ) FROM DUAL
+	</select>
+	
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.tp.CompanyTjMapper">
+
+	<resultMap id="companyTjMap" type="com.bossien.entity.CompanyTj">
+		<id column="company_id" property="company_id"></id>
+		<result column="company_name" property="company_name"></result>
+		<result column="count_project" property="count_project"></result>
+		<result column="count_user" property="count_user"></result>
+		<result column="count_train" property="count_train"></result>
+		<result column="count_train_complete_yes" property="count_train_complete_yes"></result>
+		<result column="count_exam" property="count_exam"></result>
+		<result column="count_exam_pass_yes" property="count_exam_pass_yes"></result>
+		<result column="percent_train_complete" property="percent_train_complete"></result>
+		<result column="count_train_user" property="count_train_user"></result>
+		<result column="count_course" property="count_course"></result>
+		<result column="count_question" property="count_question"></result>
+		<result column="total_class_hour" property="total_class_hour"></result>
+		<result column="average_person_class_hour" property="average_person_class_hour"></result>
+		<result column="total_year_class_hour" property="total_year_class_hour"></result>
+		<result column="average_year_class_hour" property="average_year_class_hour"></result>
+		<result column="create_user" property="createUser"></result>
+		<result column="create_time" property="createTime"></result>
+		<result column="oper_user" property="operUser"></result>
+		<result column="oper_time" property="operTime"></result>
+	</resultMap>
+
+	<!--查询单条记录-->
+   <select id="selectOne"  resultMap="companyTjMap">
+	  select
+	    company_name,count_project, count_user,
+	    count_train,count_train_complete_yes,
+	    count_exam,count_exam_pass_yes,
+	    percent_train_complete,count_train_user ,
+	    count_course,count_question ,
+	    total_class_hour, average_person_class_hour,
+	    total_year_class_hour,average_year_class_hour,
+	    oper_user,oper_time
+	  from company_tj where company_id = #{company_id}
+  </select>
+	<sql id="baseColumn">
+		company_id,company_name, count_user, total_class_hour
+	</sql>
+
+	<select id="selectList" parameterType="java.util.Map" resultType="java.util.Map">
+		select
+		<include refid="baseColumn"/>
+		FROM company_tj
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="companyIds !=null and companyIds.size() > 0">
+				and
+				<foreach item="item" index="index" collection="companyIds" separator="or" open="(" close=")">
+					company_id = #{item}
+				</foreach>
+			</if>
+		</trim>
+		order by total_class_hour desc
+	</select>
+</mapper>

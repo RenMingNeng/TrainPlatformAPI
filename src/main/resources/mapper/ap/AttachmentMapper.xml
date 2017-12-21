@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.ap.AttachmentMapper">
+
+    <resultMap id="attachmentMap" type="com.bossien.entity.Attachment">
+        <id column="intId" property="intId"></id>
+        <result column="varFid" property="varFid"></result>
+        <result column="varLocalName" property="varLocalName"></result>
+        <result column="varRemotePath" property="varRemotePath"></result>
+        <result column="varExt" property="varExt"></result>
+        <result column="varType" property="varType"></result>
+        <result column="intBusinessId" property="intBusinessId"></result>
+        <result column="varMd5" property="varMd5"></result>
+        <result column="chrComplete" property="chrComplete"></result>
+        <result column="varRemark" property="varRemark"></result>
+        <result column="varCreateUser" property="varCreateUser"></result>
+        <result column="datCreateDate" property="datCreateDate"></result>
+        <result column="varOperUser" property="varOperUser"></result>
+        <result column="datOperDate" property="datOperDate"></result>
+    </resultMap>
+
+    <sql id="baseColumn">
+        intId, varFid, varLocalName,varRemotePath, varExt, varType, intBusinessId, varMd5, chrComplete, varRemark, varCreateUser, datCreateDate, varOperUser, datOperDate
+    </sql>
+
+    <select id="selectList" parameterType="java.util.Map" resultMap="attachmentMap">
+        select
+        <include refid="baseColumn"/>
+        from ex_attachment
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="intIds != null and intIds.size() > 0">
+                and intId in
+                <foreach item="id" index="index" collection="intIds" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="varExts != null and varExts.size() > 0">
+                and varExt in
+                <foreach item="varExt" index="index" collection="varExts" open="(" separator="," close=")">
+                    #{varExt}
+                </foreach>
+            </if>
+
+        </trim>
+    </select>
+
+</mapper>

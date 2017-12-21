@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bossien.mapper.tp.PersonDossierMapper">
+
+	<resultMap id="personDossierMap" type="com.bossien.entity.PersonDossier">
+		<id column="id" property="id"></id>
+		<result column="user_id" property="user_id"></result>
+		<result column="user_name" property="user_name"></result>
+		<result column="role_id" property="role_id"></result>
+		<result column="role_name" property="role_name"></result>
+		<result column="company_id" property="company_id"></result>
+		<result column="company_name" property="company_name"></result>
+		<result column="year_studytime" property="year_studytime"></result>
+		<result column="total_studytime" property="total_studytime"></result>
+		<result column="train_count" property="train_count"></result>
+		<result column="create_user" property="create_user"></result>
+		<result column="create_time" property="create_time"></result>
+		<result column="oper_user" property="oper_user"></result>
+		<result column="oper_time" property="oper_time"></result>
+	</resultMap>
+
+	<sql id="baseColumn">
+		id,user_id,user_name,role_id,role_name,company_id,company_name,dept_name,year_studytime,total_studytime,train_count,create_user,create_time,oper_user,oper_time
+	</sql>
+
+	<insert id="insert" parameterType="com.bossien.entity.PersonDossier">
+		insert into person_dossier_info	(
+		<trim prefix="" prefixOverrides=",">
+			<if test="id !=null and id != ''">,id</if>
+			<if test="user_id !=null and user_id !=''">,user_id</if>
+			<if test="user_name !=null and user_name !=''">,user_name</if>
+			<if test="role_id !=null and role_id !=''">,role_id</if>
+			<if test="role_name !=null and role_name !=''">,role_name</if>
+			<if test="company_id !=null and company_id !=''">,company_id</if>
+			<if test="company_name !=null and company_name !=''">,company_name</if>
+			<if test="year_studytime !=null and year_studytime !=''">,year_studytime</if>
+			<if test="total_studytime !=null and total_studytime !=''">,total_studytime</if>
+			<if test="train_count !=null and train_count !=''">,train_count</if>
+			<if test="create_user !=null and create_user !=''">,create_user</if>
+			<if test="create_time !=null and create_time !=''">,create_time</if>
+			<if test="oper_user !=null and oper_user !=''"> ,oper_user </if>
+			<if test="oper_time !=null and oper_time !=''"> ,oper_time </if>
+		</trim>
+		) values (
+		<trim prefix="" prefixOverrides=",">
+			<if test="id !=null and id !=''"> ,#{id} </if>
+			<if test="user_id !=null and user_id !=''"> ,#{user_id} </if>
+			<if test="user_name !=null and user_name !=''"> ,#{user_name} </if>
+			<if test="role_id !=null and role_id !=''"> ,#{role_id} </if>
+			<if test="role_name !=null and role_name !=''"> ,#{role_name} </if>
+			<if test="company_id !=null and company_id !=''"> ,#{company_id} </if>
+			<if test="company_name !=null and company_name !=''"> ,#{company_name} </if>
+			<if test="year_studytime !=null and year_studytime !=''"> ,#{year_studytime} </if>
+			<if test="total_studytime !=null and total_studytime !=''"> ,#{total_studytime} </if>
+			<if test="train_count !=null and train_count !=''"> ,#{train_count} </if>
+			<if test="create_user !=null and create_user !=''"> ,#{create_user} </if>
+			<if test="create_time !=null and create_time !=''"> ,#{create_time} </if>
+			<if test="oper_user !=null and oper_user !=''"> ,#{oper_user} </if>
+			<if test="oper_time !=null and oper_time !=''"> ,#{oper_time} </if>
+		</trim>
+		)
+	</insert>
+
+	<insert id="insertBatch" parameterType="java.util.List">
+		insert into person_dossier_info (
+			id,user_id,user_name,role_id,role_name,company_id,
+			company_name,dept_name,year_studytime,total_studytime,train_count,
+			create_user,create_time,oper_user,oper_time
+		)
+		values
+		<if test="list !=null and list.size >0">
+			<foreach item="item" index="index" collection="list" separator=",">
+				(
+				#{item.id},#{item.user_id}, #{item.user_name}, #{item.role_id},#{item.role_name},#{item.company_id},
+				#{item.company_name},#{item.deptName},#{item.year_studytime},#{item.total_studytime},#{item.train_count},
+				#{item.create_user},#{item.create_time}, #{item.oper_user},#{item.oper_time}
+				)
+			</foreach>
+		</if>
+	</insert>
+
+	<update id="update" parameterType="com.bossien.entity.PersonDossier">
+		update person_dossier_info
+		<trim prefix="set" prefixOverrides=",">
+			<if test="user_name !=null and user_name !=''"> ,user_name = #{user_name} </if>
+			<if test="role_name !=null and role_name !=''"> ,role_name = #{role_name} </if>
+			<if test="company_name !=null and company_name !=''"> ,company_name = #{company_name} </if>
+			<if test="year_studytime !=null and year_studytime !=''"> ,year_studytime = #{year_studytime} </if>
+			<if test="total_studytime !=null and total_studytime !=''"> ,total_studytime = #{total_studytime} </if>
+			<if test="train_count !=null and train_count !=''"> ,train_count = #{train_count} </if>
+			<if test="oper_user !=null and oper_user !=''"> ,oper_user = #{oper_user} </if>
+			<if test="oper_time !=null and oper_time !=''"> ,oper_time = #{oper_time} </if>
+		</trim>
+		where user_id=#{user_id} and company_id = #{company_id}
+	</update>
+
+	<select id="selectList" parameterType="com.bossien.entity.PersonDossier" resultType="com.bossien.entity.PersonDossier">
+		select
+		<include refid="baseColumn"/>
+		FROM person_dossier_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="company_id !=null and company_id !=''">
+				and company_id = #{company_id}
+			</if>
+			<if test="id !=null and id !=''">
+				and id = #{id}
+			</if>
+			<if test="user_id !=null and user_id !=''">
+				and user_id = #{user_id}
+			</if>
+			<if test="user_name !=null and user_name !=''">
+				and user_name like #{user_name}
+			</if>
+			<if test="role_id !=null and role_id !=''">
+				and role_id = #{role_id}
+			</if>
+			<if test="role_name !=null and role_name !=''">
+				and role_name like #{role_name}
+			</if>
+			<if test="user_ids !=null and user_ids.size() > 0">
+				and
+				<foreach item="item" index="index" collection="user_ids" separator="or" open="(" close=")">
+					user_id = #{item}
+				</foreach>
+			</if>
+		</trim>
+		order by create_time desc
+		<!--<if test="startNum !=null and endNum != null">
+			<include refid="CommonMapper.mysqlPage" />
+		</if>-->
+	</select>
+
+	<select id="selectOne" parameterType="com.bossien.entity.PersonDossier" resultType="com.bossien.entity.PersonDossier">
+		select
+		<include refid="baseColumn"/>
+		FROM person_dossier_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="company_id !=null and company_id !=''">
+				and company_id = #{company_id}
+			</if>
+			<if test="id !=null and id !=''">
+				and id = #{id}
+			</if>
+			<if test="user_id !=null and user_id !=''">
+				and user_id = #{user_id}
+			</if>
+			<if test="role_id !=null and role_id !=''">
+				and role_id = #{role_id}
+			</if>
+
+		</trim>
+		limit 1
+	</select>
+
+	<select id="selectCount" resultType="java.lang.Integer">
+		select count(1) FROM person_dossier_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="company_id !=null and company_id !=''">
+				and company_id = #{company_id}
+			</if>
+			<if test="id !=null and id !=''">
+				and id = #{id}
+			</if>
+			<if test="user_id !=null and user_id !=''">
+				and user_id = #{user_id}
+			</if>
+			<if test="user_name !=null and user_name !=''">
+				and user_name like #{user_name}
+			</if>
+			<if test="role_id !=null and role_id !=''">
+				and role_id = #{role_id}
+			</if>
+			<if test="role_name !=null and role_name !=''">
+				and role_name like #{role_name}
+			</if>
+			<if test="user_ids !=null and user_ids.size() > 0">
+				and
+				<foreach item="item" index="index" collection="user_ids" separator="or" open="(" close=")">
+					user_id = #{item}
+				</foreach>
+			</if>
+		</trim>
+	</select>
+
+	<!-- 查询用户排名 -->
+	<select id="selectRank" parameterType="java.util.Map" resultType="java.util.Map">
+		select
+			p.rownum,
+			p.company_name,
+			p.year_studytime,
+			p.total_studytime,
+		  p.train_count
+		FROM
+			(select
+				@rownum := @rownum + 1 AS rownum,
+				u.year_studytime,
+				u.user_id,
+				u.company_name,
+				u.total_studytime,
+				u.train_count
+			from
+				person_dossier_info u,
+				(SELECT @rownum := 0) r
+		<trim prefix="WHERE" prefixOverrides="AND">
+			u.company_id in
+			<if test="company_ids != null and company_ids.size>0">
+				<foreach collection="company_ids" index="index" item="company_id" open="(" separator="," close=")">
+					#{company_id}
+				</foreach>
+			</if>
+		</trim>
+		order by u.year_studytime DESC) p
+		WHERE p.user_id = #{user_id}
+	</select>
+
+	<update id="updateByuser_ids" parameterType="java.util.Map">
+       update person_dossier_info
+		<trim prefix="set" prefixOverrides=",">
+			<if test="deptName !=null and deptName !=''">
+				 dept_name = #{deptName}
+			</if>
+		</trim>
+		<where>
+			<if test="company_id !=null and company_id !=''">
+				and company_id = #{company_id}
+			</if>
+			<if test="user_ids !=null and user_ids.size() > 0">
+				and
+				<foreach item="item" index="index" collection="user_ids" separator="or" open="(" close=")">
+					user_id = #{item}
+				</foreach>
+			</if>
+
+		</where>
+	</update>
+
+	<select id="selectListByParams" parameterType="java.util.Map" resultType="java.util.Map">
+		select
+			<include refid="baseColumn"/>
+		FROM person_dossier_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="company_id !=null and company_id !=''">
+				and company_id = #{company_id}
+			</if>
+			<if test="id !=null and id !=''">
+				and id = #{id}
+			</if>
+			<if test="user_name !=null and user_name !=''">
+				and user_name like #{user_name}
+			</if>
+		</trim>
+		order by create_time desc
+		<if test="start_num !=null and end_num != null">
+			<include refid="mysqlPage" />
+		</if>
+	</select>
+
+	<select id="selectCountByParams" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select
+			COUNT(id)
+		FROM person_dossier_info
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="company_id !=null and company_id !=''">
+				and company_id = #{company_id}
+			</if>
+			<if test="user_name !=null and user_name !=''">
+				and user_name like #{user_name}
+			</if>
+		</trim>
+	</select>
+
+	<!-- mysql分页查询 -->
+	<sql id="mysqlPage">
+		<![CDATA[
+		    limit #{start_num},#{end_num}
+        ]]>
+	</sql>
+</mapper>

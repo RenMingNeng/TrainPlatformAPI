@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bossien.mapper.tp.ProjectDepartmentMapper">
+
+    <select id="selectCountByParams" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT count(id)
+        FROM project_department
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="company_id != null and company_id != ''">
+                AND company_id = #{company_id}
+            </if>
+            <if test="project_id != null and project_id != ''">
+                AND project_id = #{project_id}
+            </if>
+            <if test="dept_name != null and dept_name != ''">
+                AND dept_name like #{company_id}
+            </if>
+        </trim>
+    </select>
+
+    <select id="selectListByParams" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        dept_id,dept_name,company_id
+        FROM project_department
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="company_id != null and company_id != ''">
+                AND company_id = #{company_id}
+            </if>
+            <if test="project_id != null and project_id != ''">
+                AND project_id = #{project_id}
+            </if>
+            <if test="dept_name != null and dept_name != ''">
+                AND dept_name like #{dept_name}
+            </if>
+        </trim>
+        <if test="startNum !=null and endNum != null">
+          <include refid="mysqlPage"/>
+        </if>
+    </select>
+
+    <select id="selectListByProjectId" parameterType="java.util.Map" resultType="com.bossien.entity.ProjectDepartment">
+        SELECT
+        dept_id,dept_name,company_id
+        FROM project_department
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="project_id != null and project_id != ''">
+                AND project_id = #{project_id}
+            </if>
+        </trim>
+    </select>
+
+
+    <!-- mysql分页查询 -->
+    <sql id="mysqlPage">
+        <![CDATA[
+		    limit #{start_num},#{end_num}
+        ]]>
+    </sql>
+</mapper>
